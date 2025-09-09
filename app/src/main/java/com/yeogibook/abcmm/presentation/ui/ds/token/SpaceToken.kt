@@ -17,18 +17,23 @@ enum class SpaceToken(val dp: Dp) {
     _12(12.dp),
     _16(16.dp),
     _32(32.dp),
-    _52(52.dp)
+    _36(36.dp),
+    _40(40.dp),
+    _44(44.dp),
+    _48(48.dp),
+    _52(52.dp),
+    _60(60.dp)
 }
 
 @Stable
 fun SpaceTokenValues(
-    all: SpaceToken
+    all: SpaceToken,
 ): SpaceTokenValues = SpaceTokenValuesImpl(all, all, all, all)
 
 @Stable
 fun SpaceTokenValues(
     horizontal: SpaceToken = SpaceToken._0,
-    vertical: SpaceToken = SpaceToken._0
+    vertical: SpaceToken = SpaceToken._0,
 ): SpaceTokenValues =
     SpaceTokenValuesImpl(horizontal, vertical, horizontal, vertical)
 
@@ -37,7 +42,7 @@ fun SpaceTokenValues(
     start: SpaceToken = SpaceToken._0,
     top: SpaceToken = SpaceToken._0,
     end: SpaceToken = SpaceToken._0,
-    bottom: SpaceToken = SpaceToken._0
+    bottom: SpaceToken = SpaceToken._0,
 ): SpaceTokenValues = SpaceTokenValuesImpl(start, top, end, bottom)
 
 @Stable

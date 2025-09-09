@@ -1,5 +1,7 @@
 package com.yeogibook.abcmm.presentation.ui.ds.token
 
+import androidx.compose.runtime.Stable
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
@@ -13,4 +15,15 @@ object TypographyToken {
         Font(R.font.gothic_medium, FontWeight.Medium, FontStyle.Normal),
         Font(R.font.gothic_regular, FontWeight.Normal, FontStyle.Normal)
     )
+}
+
+
+class TextStyleToken {
+    companion object {
+        @Stable
+        val Default = TextStyle(
+            fontWeight = FontWeight.Normal,
+            fontFamily = TypographyToken.Gothic
+        )
+    }
 }

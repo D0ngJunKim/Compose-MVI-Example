@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
-abstract class BaseViewModel<ViewState : Any, SideEffect : Any, Intent : Any> : ViewModel() {
+abstract class BaseViewModel<ViewState : BaseViewState<Intent>, SideEffect : Any, Intent : Any> : ViewModel() {
     abstract val repository: IRepository?
     abstract fun loadInit()
     abstract fun processIntent(intent: Intent)
@@ -56,6 +56,10 @@ abstract class BaseViewModel<ViewState : Any, SideEffect : Any, Intent : Any> : 
     protected fun updateState(updated: ViewState): Boolean {
         _viewState.value = updated
         return _viewState.value != updated
+    }
+
+    protected fun setLoading(isLoading: Boolean) {
+        _isLoading.value = isLoading
     }
 }
 

@@ -13,6 +13,5 @@ abstract class BaseRequest<RESPONSE> : AbstractRequest<RESPONSE>() {
     override fun setupOkHttp(builder: OkHttpClient.Builder): OkHttpClient.Builder {
         return builder
             .addInterceptor(AuthInterceptor())
-            .addInterceptor(RetryInterceptor())
     }
 }

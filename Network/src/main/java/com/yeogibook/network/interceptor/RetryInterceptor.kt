@@ -17,7 +17,7 @@ class RetryInterceptor : Interceptor {
                 lastResponse?.close()
                 val response = chain.proceed(chain.request())
 
-                if (response.code() in 500..599) {
+                if (response.code in 500..599) {
                     return response
                 }
 
