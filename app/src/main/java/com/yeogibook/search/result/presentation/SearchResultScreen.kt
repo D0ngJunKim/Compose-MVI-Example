@@ -7,27 +7,32 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.yeogibook.abcmm.presentation.core.AppState
 import com.yeogibook.abcmm.presentation.core.List
 import com.yeogibook.abcmm.presentation.core.NavigationRoute
 import com.yeogibook.abcmm.presentation.core.rememberAppState
-import com.yeogibook.abcmm.presentation.ui.SpacerUiItem
 import com.yeogibook.abcmm.presentation.ui.ds.CircularProgressIndicator
 import com.yeogibook.abcmm.presentation.ui.onClick
 import com.yeogibook.abcmm.presentation.vm.observeSideEffects
 import com.yeogibook.search.keyin.presentation.SearchKeyInExtra
+import com.yeogibook.search.keyin.presentation.SearchKeyInScreen
 import com.yeogibook.search.result.presentation.units.header.SearchResultHeaderUiItem
 import com.yeogibook.search.result.presentation.vm.SearchResultViewModel
 import com.yeogibook.search.result.presentation.vm.intent.SearchResultSideEffect
+
+private const val QUERY_KEY = "SearchResultScreen"
 
 @Composable
 fun SearchResultScreen(
@@ -35,12 +40,19 @@ fun SearchResultScreen(
     viewModel: SearchResultViewModel = hiltViewModel(),
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
-    val isLoading by viewModel.isLoading.collectAsState()
     val listState = rememberLazyListState()
-    val headerUiItem = remember { SearchResultHeaderUiItem() }
+    val items = viewModel.uiFlow.collectAsLazyPagingItems()
 
-    LaunchedEffect(viewModel.hashCode()) {
-        viewModel.loadInit()
+    var isShowKeyIn by remember { mutableStateOf(false) }
+    var keyInExtra: SearchKeyInExtra? by remember { mutableStateOf(null) }
+    val currentEntry by appState.navController.currentBackStackEntryAsState()
+    val query = currentEntry?.savedStateHandle?.get<String>(QUERY_KEY)
+
+    val headerUiItem = remember(query) { SearchResultHeaderUiItem(query) }
+
+
+    LaunchedEffect(query) {
+        viewModel.setQuery(query)
     }
 
     DisposableEffect(
@@ -49,7 +61,12 @@ fun SearchResultScreen(
         val job = viewModel.observeSideEffects(lifecycleOwner.lifecycle) { sideEffect ->
             when (sideEffect) {
                 is SearchResultSideEffect.OpenKeyIn -> {
-                    appState.navigate(NavigationRoute.KeyIn.route(SearchKeyInExtra(sideEffect.query)))
+                    isShowKeyIn = true
+                    keyInExtra = SearchKeyInExtra(sideEffect.query)
+                }
+
+                is SearchResultSideEffect.OpenDetail -> {
+                    appState.navigate(NavigationRoute.Detail.route(sideEffect.origin))
                 }
             }
         }
@@ -60,25 +77,29 @@ fun SearchResultScreen(
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column {
-            headerUiItem.BuildStickyItem(viewModel::processIntent)
+            headerUiItem.BuildItem(viewModel::processIntent)
 
             List(
                 listState = listState,
                 viewModel = viewModel,
-                isUsePullToRefresh = true,
-                contentGap = 10.dp,
-                headerItem = remember { SpacerUiItem(0.dp) }
+                items = items
             )
         }
-
-        if (isLoading) {
+        if (items.loadState.refresh is LoadState.Loading) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .onClick(onClick = {})
+                    .onClick {}
             ) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
+        }
+    }
+
+    if (isShowKeyIn) {
+        SearchKeyInScreen(appState, keyInExtra, QUERY_KEY) {
+            isShowKeyIn = false
+            keyInExtra = null
         }
     }
 }

@@ -1,7 +1,10 @@
 package com.yeogibook.abcmm.data.entity
 
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 data class BookDocumentDiData(
     val title: String?,                 // 도서 제목
     val contents: String?,              // 도서 소개
@@ -16,6 +19,6 @@ data class BookDocumentDiData(
     val salePrice: Int?,                // 도서 판매가
     val thumbnail: String?,             // 도서 표지 미리보기 URL
     val status: String?,                // 도서 판매 상태
-) {
+) : Parcelable {
     constructor() : this(null, null, null, null, null, null, null, null, null, null, null, null)
 }

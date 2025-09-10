@@ -1,118 +1,200 @@
 package com.yeogibook.search.keyin.presentation
 
-import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.clearText
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.skydoves.flexible.bottomsheet.material3.FlexibleBottomSheet
+import com.skydoves.flexible.core.FlexibleSheetSize
+import com.skydoves.flexible.core.FlexibleSheetState
+import com.skydoves.flexible.core.FlexibleSheetValue
+import com.skydoves.flexible.core.rememberFlexibleBottomSheetState
+import com.yeogibook.R
 import com.yeogibook.abcmm.presentation.core.AppState
+import com.yeogibook.abcmm.presentation.core.rememberAppState
 import com.yeogibook.abcmm.presentation.ui.LocalText
-import kotlinx.coroutines.delay
+import com.yeogibook.abcmm.presentation.ui.LocalTextField
+import com.yeogibook.abcmm.presentation.ui.ds.padding
+import com.yeogibook.abcmm.presentation.ui.ds.token.SpaceToken
+import com.yeogibook.abcmm.presentation.ui.ds.token.TextStyleToken
+import com.yeogibook.abcmm.presentation.ui.onClick
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun SearchKeyInScreen(
     appState: AppState,
     extra: SearchKeyInExtra? = null,
-    onDismiss: () -> Unit = {},
+    querySaveKey: String,
+    keyboardType: KeyboardType = KeyboardType.Text,
+    hintText: String = "검색어를 입력해 주세요.",
+    onDismissRequest: () -> Unit
 ) {
-    var showBottomSheetContent by remember { mutableStateOf(false) }
-    val interactionSource = remember { MutableInteractionSource() }
-
-    LaunchedEffect(Unit) {
-        showBottomSheetContent = true
-    }
-
-    // showBottomSheetContent가 false가 되면 애니메이션 완료 후 onDismissRequest 호출
-    LaunchedEffect(showBottomSheetContent) {
-        if (!showBottomSheetContent) {
-            delay(300) // 애니메이션 지속 시간 (300ms)만큼 기다린 후
-            onDismiss() // MainScreen에 닫기 요청을 보냄
-        }
-    }
-
-    BackHandler {
-        showBottomSheetContent = false // exit 애니메이션 트리거
-    }
-
-    // 전체 화면 Box, 배경 클릭 처리 및 바텀 시트 콘텐츠 포함
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            // 배경을 클릭하면 바텀 시트가 닫히도록 합니다.
-            .clickable(
-                onClick = { showBottomSheetContent = false },
-                indication = null,
-                interactionSource = interactionSource
-            )
-    ) {
-        // 배경 딤 애니메이션
-        AnimatedVisibility(
-            visible = showBottomSheetContent,
-            enter = fadeIn(animationSpec = tween(300)),
-            exit = fadeOut(animationSpec = tween(300))
-        ) {
-            // 전체 화면을 덮는 어두운 반투명 배경
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.5f))
-            )
-        }
-
-        // 바텀 시트 콘텐츠 애니메이션
-        AnimatedVisibility(
-            visible = showBottomSheetContent,
-            modifier = Modifier.align(Alignment.BottomCenter),
-            enter = slideInVertically(
-                initialOffsetY = { fullHeight -> fullHeight },
-                animationSpec = tween(300)
-            ),
-            exit = slideOutVertically(
-                targetOffsetY = { fullHeight -> fullHeight },
-                animationSpec = tween(300)
-            )
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.White)
-                    .height(300.dp)
-                    // 이 Column 내부의 클릭은 부모 Box의 clickable에 영향을 주지 않도록
-                    // `clickable` 모디파이어를 추가하고, 클릭 이벤트를 소비합니다.
-                    .clickable(
-                        onClick = {}, // 아무 동작 없음, 이벤트 소비 목적
-                        indication = null,
-                        interactionSource = remember { MutableInteractionSource() }
-                    )
-            ) {
-                // 여기에 SearchKeyInScreen의 실제 UI 컴포넌트들을 추가합니다.
-                LocalText(text = "Search Key In Screen Content", color = Color.Black)
-                extra?.let {
-                    LocalText(text = "Query from extra: ${it.query}", color = Color.Black)
-                }
+    val focusRequester = remember { FocusRequester() }
+    val sheetState = rememberFlexibleBottomSheetState(
+        flexibleSheetSize = FlexibleSheetSize(
+            fullyExpanded = 0.90f
+        ),
+        skipSlightlyExpanded = true,
+        skipIntermediatelyExpanded = true,
+        isModal = true
+    )
+    FlexibleBottomSheet(
+        onDismissRequest = {
+            onDismissRequest()
+        },
+        sheetState = sheetState,
+        containerColor = Color.White,
+        dragHandle = { Spacer(Modifier.height(20.dp)) },
+        onTargetChanges = { value ->
+            if (value == FlexibleSheetValue.FullyExpanded) {
+                focusRequester.requestFocus()
             }
         }
+    ) {
+        BottomSheetContents(
+            appState,
+            extra,
+            focusRequester,
+            sheetState,
+            querySaveKey,
+            keyboardType,
+            hintText,
+            onDismissRequest
+        )
+    }
+}
+
+@Composable
+private fun BottomSheetContents(
+    appState: AppState,
+    extra: SearchKeyInExtra?,
+    focusRequester: FocusRequester,
+    sheetState: FlexibleSheetState,
+    querySaveKey: String,
+    keyboardType: KeyboardType = KeyboardType.Text,
+    hintText: String = "검색어를 입력해 주세요.",
+    onDismissRequest: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = SpaceToken._16)
+    ) {
+        val queryState = rememberTextFieldState(extra?.query.orEmpty())
+        val keyboardController = LocalSoftwareKeyboardController.current
+
+        Box(modifier = Modifier.fillMaxWidth()) {
+            LocalTextField(
+                state = queryState,
+                textStyle = TextStyleToken.Default.merge(
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Medium
+                ),
+                lineLimits = TextFieldLineLimits.SingleLine,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(
+                        width = 1.dp,
+                        color = colorResource(R.color.gray900),
+                        shape = RoundedCornerShape(6.dp)
+                    )
+                    .padding(
+                        start = SpaceToken._10,
+                        top = SpaceToken._16,
+                        end = SpaceToken._60,
+                        bottom = SpaceToken._16
+                    )
+                    .focusRequester(focusRequester)
+                    .onFocusChanged { state ->
+                        if (state.isFocused) {
+                            keyboardController?.show()
+                        } else {
+                            keyboardController?.hide()
+                        }
+                    },
+                onKeyboardAction = {
+                    appState.navController.currentBackStackEntry?.savedStateHandle?.set(
+                        querySaveKey,
+                        queryState.text
+                    )
+                    appState.scope.launch(Dispatchers.Main.immediate) {
+                        sheetState.hide()
+                        onDismissRequest()
+                    }
+                },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = keyboardType,
+                    imeAction = ImeAction.Search
+                ),
+                decorator = { innerTextField ->
+                    if (queryState.text.isEmpty()) {
+                        LocalText(
+                            text = hintText,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = colorResource(R.color.gray500),
+                            includeFontPadding = false
+                        )
+                    } else {
+                        innerTextField()
+                    }
+                }
+            )
+
+            if (queryState.text.isNotEmpty()) {
+                Image(
+                    painter = painterResource(R.drawable.token_cancel),
+                    contentDescription = "입력한 검색어 삭제",
+                    modifier = Modifier
+                        .padding(end = SpaceToken._40)
+                        .size(20.dp)
+                        .align(Alignment.CenterEnd)
+                        .onClick {
+                            queryState.clearText()
+                        },
+                    colorFilter = ColorFilter.tint(colorResource(R.color.gray600))
+                )
+            }
+
+            Image(
+                painter = painterResource(R.drawable.token_search),
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(end = SpaceToken._10)
+                    .size(20.dp)
+                    .align(Alignment.CenterEnd)
+            )
+        }
+
     }
 }
 
@@ -120,3 +202,15 @@ fun SearchKeyInScreen(
 data class SearchKeyInExtra(
     val query: String,
 )
+
+@Preview(showBackground = true)
+@Composable
+private fun Preview() {
+    BottomSheetContents(
+        rememberAppState(),
+        SearchKeyInExtra("검색어를 입력해 주세요."),
+        remember { FocusRequester() },
+        rememberFlexibleBottomSheetState(),
+        "",
+    ) { }
+}

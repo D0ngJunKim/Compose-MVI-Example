@@ -4,6 +4,7 @@ kotlin = "2.2.10"
 parcelize = "2.2.10"
 coil = "3.3.0"
 hilt = "2.57.1"
+paging = "3.3.6"
 androidXHilt = "1.2.0"
 coreKtx = "1.17.0"
 junit = "4.13.2"
@@ -40,12 +41,17 @@ androidx-foundation = { group = "androidx.compose.foundation", name = "foundatio
 androidx-animation = { group = "androidx.compose.animation", name = "animation" }
 androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata" }
 
+androidx-paging = { group = "androidx.paging", name = "paging-runtime", version.ref = "paging" }
+androidx-paging-compose = { group = "androidx.paging", name = "paging-compose", version.ref = "paging" }
+
 coil = { group = "io.coil-kt.coil3", name = "coil", version.ref = "coil" }
 coil-network-okhttp = { group = "io.coil-kt.coil3", name = "coil-network-okhttp", version.ref = "coil" }
 coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }
 hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "androidXHilt" }
+
+flexible-bottomsheet = { group = "com.github.skydoves", name = "flexible-bottomsheet-material3", version = "0.1.5" }
 
 # Network
 squareup-retrofit2 = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit2" }

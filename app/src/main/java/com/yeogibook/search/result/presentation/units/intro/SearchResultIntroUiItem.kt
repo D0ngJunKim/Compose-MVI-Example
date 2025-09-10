@@ -27,7 +27,7 @@ class SearchResultIntroUiItem : LazyItem<SearchResultIntent>() {
         ) {
             val (image, text) = createRefs()
             Image(
-                painter = painterResource(R.drawable.token_sentiment_dissatisfied),
+                painter = painterResource(R.drawable.token_globe_book),
                 contentDescription = null,
                 modifier = Modifier.constrainAs(image) {
                     top.linkTo(parent.top)
@@ -38,7 +38,7 @@ class SearchResultIntroUiItem : LazyItem<SearchResultIntent>() {
             )
 
             LocalText(
-                text = "죄송합니다. 다른 검색어로 검색해주세요.",
+                text = "원하시는 도서를 검색해보세요.",
                 fontSize = 13.sp,
                 color = colorResource(R.color.gray900),
                 modifier = Modifier.constrainAs(text) {

@@ -50,22 +50,26 @@ import com.yeogibook.abcmm.presentation.ui.onClick
 import com.yeogibook.favorite.presentation.util.FavoriteBookManager
 import com.yeogibook.search.result.presentation.vm.intent.SearchResultIntent
 
-class SearchResultItemUiItem(
+data class SearchResultItemUiItem(
     private val imageUrl: String?,
     private val saleStatus: String?,
-    private val bookName: String?,
-    private val authorName: String?,
+    private val title: String?,
+    private val subTitle: String?,
     private val originPrice: String?,
     private val displayPrice: String?,
     private val origin: BookDocumentDiData,
 ) : LazyItem<SearchResultIntent>() {
+
+    override fun itemKey(): Int {
+        return origin.isbn?.replace(" ", "")?.toIntOrNull() ?: super.itemKey()
+    }
 
     @Composable
     override fun BuildItem(processIntent: (SearchResultIntent) -> Unit) {
         ConstraintLayout(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = SpaceToken._16)
+                .padding(horizontal = SpaceToken._16, vertical = SpaceToken._4)
                 .card(
                     shape = RoundedCornerShape(10.dp),
                     shadow = Shadow(
@@ -76,9 +80,12 @@ class SearchResultItemUiItem(
                     )
                 )
                 .padding(horizontal = SpaceToken._16, vertical = SpaceToken._10)
+                .onClick {
+                    processIntent(SearchResultIntent.OpenDetail(origin))
+                }
         ) {
-            val (thumbnail, status, title, authors, originPrc, dispPrc, btnFavorite) = createRefs()
-            val leftBarrier = createEndBarrier(margin = 10.dp, elements = arrayOf(thumbnail))
+            val (vThumbnail, vStatus, vTitle, vSubTitle, vOriginPrice, vDispPrice, btnFavorite) = createRefs()
+            val leftBarrier = createEndBarrier(margin = 10.dp, elements = arrayOf(vThumbnail))
             val rightBarrier = createStartBarrier(margin = (-4).dp, elements = arrayOf(btnFavorite))
 
             AsyncImage(
@@ -92,7 +99,7 @@ class SearchResultItemUiItem(
                 modifier = Modifier
                     .width(80.dp)
                     .height(100.dp)
-                    .constrainAs(thumbnail) {
+                    .constrainAs(vThumbnail) {
                         top.linkTo(parent.top)
                         start.linkTo(parent.start)
                     }
@@ -102,11 +109,11 @@ class SearchResultItemUiItem(
                 Box(
                     modifier = Modifier
                         .background(colorResource(R.color.black_alpha10))
-                        .constrainAs(status) {
+                        .constrainAs(vStatus) {
                             width = Dimension.fillToConstraints
-                            start.linkTo(thumbnail.start)
-                            end.linkTo(thumbnail.end)
-                            bottom.linkTo(thumbnail.bottom)
+                            start.linkTo(vThumbnail.start)
+                            end.linkTo(vThumbnail.end)
+                            bottom.linkTo(vThumbnail.bottom)
                         }) {
                     LocalText(
                         text = saleStatus,
@@ -120,13 +127,13 @@ class SearchResultItemUiItem(
             }
 
             LocalText(
-                text = bookName.orEmpty(),
+                text = title.orEmpty(),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
                 color = colorResource(R.color.gray900),
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.constrainAs(title) {
+                modifier = Modifier.constrainAs(vTitle) {
                     start.linkTo(leftBarrier)
                     top.linkTo(parent.top)
                     end.linkTo(rightBarrier)
@@ -134,14 +141,14 @@ class SearchResultItemUiItem(
                 })
 
             LocalText(
-                text = authorName.orEmpty(),
+                text = subTitle.orEmpty(),
                 fontSize = 10.sp,
                 color = colorResource(R.color.gray600),
-                maxLines = 1,
+                maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.constrainAs(authors) {
+                modifier = Modifier.constrainAs(vSubTitle) {
                     start.linkTo(leftBarrier)
-                    top.linkTo(title.bottom)
+                    top.linkTo(vTitle.bottom)
                     end.linkTo(rightBarrier)
                     width = Dimension.fillToConstraints
                 })
@@ -153,10 +160,10 @@ class SearchResultItemUiItem(
                 fontWeight = FontWeight.SemiBold,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.constrainAs(dispPrc) {
+                modifier = Modifier.constrainAs(vDispPrice) {
                     start.linkTo(leftBarrier)
-                    top.linkTo(authors.bottom, 8.dp)
-                    end.linkTo(dispPrc.start)
+                    top.linkTo(vSubTitle.bottom, 8.dp)
+                    end.linkTo(vDispPrice.start)
                 })
 
             if (!originPrice.isNullOrEmpty()) {
@@ -168,16 +175,16 @@ class SearchResultItemUiItem(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     textDecoration = TextDecoration.LineThrough,
-                    modifier = Modifier.constrainAs(originPrc) {
-                        start.linkTo(dispPrc.end, 4.dp)
-                        top.linkTo(dispPrc.top)
-                        bottom.linkTo(dispPrc.bottom)
+                    modifier = Modifier.constrainAs(vOriginPrice) {
+                        start.linkTo(vDispPrice.end, 4.dp)
+                        top.linkTo(vDispPrice.top)
+                        bottom.linkTo(vDispPrice.bottom)
                         end.linkTo(rightBarrier)
                         horizontalBias = 0f
                     })
             }
 
-            var isFavorite by remember { mutableStateOf(FavoriteBookManager.isFavoriteBook(origin)) }
+            var isFavorite by remember(origin) { mutableStateOf(FavoriteBookManager.isFavoriteBook(origin)) }
 
             DisposableEffect(origin) {
                 val listener = {
@@ -194,14 +201,14 @@ class SearchResultItemUiItem(
                     .size(32.dp)
                     .onClick(
                         onClickLabel = "즐겨찾기",
-                        role = Role.Button,
-                        onClick = {
-                            if (isFavorite) {
-                                FavoriteBookManager.removeFavoriteBook(origin)
-                            } else {
-                                FavoriteBookManager.addFavoriteBook(origin)
-                            }
-                        })
+                        role = Role.Button
+                    ) {
+                        if (isFavorite) {
+                            FavoriteBookManager.removeFavoriteBook(origin)
+                        } else {
+                            FavoriteBookManager.addFavoriteBook(origin)
+                        }
+                    }
                     .constrainAs(btnFavorite) {
                         top.linkTo(parent.top)
                         end.linkTo(parent.end)
@@ -224,8 +231,8 @@ private fun Preview() {
     SearchResultItemUiItem(
         imageUrl = "",
         saleStatus = "정상판매",
-        bookName = "미\n움\n받\n을 용기",
-        authorName = "권정열",
+        title = "미\n움\n받\n을 용기",
+        subTitle = "권정열",
         originPrice = "120,000원",
         displayPrice = "100,000원",
         origin = BookDocumentDiData()

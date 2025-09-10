@@ -22,27 +22,27 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.dialog
 import com.yeogibook.abcmm.presentation.core.AppState
 import com.yeogibook.abcmm.presentation.core.NavigationRoute
 import com.yeogibook.abcmm.presentation.core.rememberAppState
 import com.yeogibook.abcmm.presentation.ui.LocalText
 import com.yeogibook.abcmm.presentation.ui.ds.padding
 import com.yeogibook.abcmm.presentation.ui.ds.token.SpaceToken
-import com.yeogibook.search.keyin.presentation.SearchKeyInScreen
+import com.yeogibook.abcmm.presentation.ui.onClick
+import com.yeogibook.bookdetail.presentation.BookDetailScreen
+import com.yeogibook.favorite.presentation.FavoriteScreen
 import com.yeogibook.search.result.presentation.SearchResultScreen
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -101,15 +101,11 @@ private fun AppNavHost(
             MainScreen(appState)
         }
 
-        dialog(
-            route = NavigationRoute.KeyIn.config.route,
-            arguments = NavigationRoute.KeyIn.config.arguments,
-            dialogProperties = DialogProperties(usePlatformDefaultWidth = true)
+        composable(
+            route = NavigationRoute.Detail.config.route,
+            arguments = NavigationRoute.Detail.config.arguments
         ) { backStackEntry ->
-            SearchKeyInScreen(
-                appState,
-                NavigationRoute.KeyIn.getExtra(backStackEntry.arguments)
-            )
+            BookDetailScreen(appState, NavigationRoute.Detail.getExtra(backStackEntry.arguments))
         }
     }
 }
@@ -117,8 +113,10 @@ private fun AppNavHost(
 @Composable
 private fun MainScreen(appState: AppState) {
     val tabs = listOf("검색", "즐겨찾기")
-    val pagerState = rememberPagerState { tabs.size }
-
+    val pagerState = rememberPagerState(
+        initialPage = 0,
+        pageCount = { tabs.size }
+    )
     Column(modifier = Modifier.fillMaxSize()) {
         Spacer(
             modifier = Modifier.height(
@@ -136,12 +134,12 @@ private fun MainScreen(appState: AppState) {
                 state = pagerState,
                 modifier = Modifier
                     .fillMaxSize(),
-                beyondViewportPageCount = 1
+                beyondViewportPageCount = 1,
+                key = { page -> tabs[page] }
             ) { page ->
-                if (LocalInspectionMode.current.not()) {
-                    when (page) {
-                        0 -> SearchResultScreen(appState)
-                    }
+                when (page) {
+                    0 -> SearchResultScreen(appState)
+                    1 -> FavoriteScreen(appState)
                 }
             }
 
@@ -159,15 +157,22 @@ private fun MainScreen(appState: AppState) {
                         .shadow(elevation = 4.dp, shape = CircleShape)
                         .background(Color.White, shape = CircleShape)
                 ) {
-                    for (tab in tabs) {
+                    for ((index, tab) in tabs.withIndex()) {
                         Box(
                             modifier = Modifier
                                 .weight(1f)
                                 .height(40.dp)
+                                .onClick {
+                                    appState.scope.launch {
+                                        pagerState.scrollToPage(tabs.indexOf(tab))
+                                    }
+                                }
                         ) {
                             LocalText(
                                 text = tab,
-                                modifier = Modifier.align(Alignment.Center)
+                                modifier = Modifier.align(Alignment.Center),
+                                color = if (pagerState.currentPage == index) Color.Red else Color.DarkGray,
+                                fontWeight = if (pagerState.currentPage == index) FontWeight.Bold else FontWeight.Normal
                             )
                         }
                     }

@@ -1,7 +1,6 @@
 package com.yeogibook.abcmm.presentation.ui
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,7 +22,7 @@ import com.yeogibook.abcmm.presentation.ui.ds.token.SpaceToken
 
 @Composable
 fun LocalTitleBar(
-    title: String,
+    text: String,
     modifier: Modifier = Modifier,
     leftButton: TitleBarButtonUiData? = null,
     rightButtons: List<TitleBarButtonUiData> = listOf()
@@ -50,12 +49,12 @@ fun LocalTitleBar(
                     .size(buttonSize)
                     .padding(2.dp)
                     .align(Alignment.CenterStart)
-                    .clickable(onClick = leftButton.onClick),
+                    .onClick(onClick = leftButton.onClick)
             )
         }
 
         LocalText(
-            text = title,
+            text = text,
             modifier = Modifier
                 .align(Alignment.Center)
                 .padding(horizontal = maxPadding),
@@ -76,7 +75,7 @@ fun LocalTitleBar(
                     modifier = Modifier
                         .size(buttonSize)
                         .padding(SpaceToken._2)
-                        .clickable(onClick = rightButton.onClick)
+                        .onClick(onClick = rightButton.onClick)
                 )
             }
         }

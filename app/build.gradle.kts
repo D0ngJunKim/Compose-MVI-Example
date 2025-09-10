@@ -13,7 +13,7 @@ android {
 
     defaultConfig {
         applicationId = "com.yeogibook"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -57,11 +57,14 @@ dependencies {
     implementation(libs.androidx.foundation)
     implementation(libs.androidx.animation)
     implementation(libs.androidx.runtime.livedata)
+    implementation(libs.androidx.paging)
+    implementation(libs.androidx.paging.compose)
     implementation(libs.coil)
     implementation(libs.coil.network.okhttp)
     implementation(libs.coil.compose)
     implementation(libs.hilt.android)
     implementation(libs.hilt.navigation.compose)
+    implementation(libs.flexible.bottomsheet)
     kapt(libs.hilt.compiler)
 
     testImplementation(libs.junit)
