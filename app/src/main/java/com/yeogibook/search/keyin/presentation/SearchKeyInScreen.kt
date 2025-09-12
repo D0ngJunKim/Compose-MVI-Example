@@ -53,10 +53,10 @@ import kotlinx.coroutines.launch
 fun SearchKeyInScreen(
     appState: AppState,
     extra: SearchKeyInExtra? = null,
-    querySaveKey: String,
     keyboardType: KeyboardType = KeyboardType.Text,
     hintText: String = "검색어를 입력해 주세요.",
-    onDismissRequest: () -> Unit
+    onQuery: (String) -> Unit,
+    onDismissRequest: () -> Unit,
 ) {
     val focusRequester = remember { FocusRequester() }
     val sheetState = rememberFlexibleBottomSheetState(
@@ -85,9 +85,9 @@ fun SearchKeyInScreen(
             extra,
             focusRequester,
             sheetState,
-            querySaveKey,
             keyboardType,
             hintText,
+            onQuery,
             onDismissRequest
         )
     }
@@ -99,10 +99,10 @@ private fun BottomSheetContents(
     extra: SearchKeyInExtra?,
     focusRequester: FocusRequester,
     sheetState: FlexibleSheetState,
-    querySaveKey: String,
     keyboardType: KeyboardType = KeyboardType.Text,
     hintText: String = "검색어를 입력해 주세요.",
-    onDismissRequest: () -> Unit
+    onQuery: (String) -> Unit,
+    onDismissRequest: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -142,10 +142,7 @@ private fun BottomSheetContents(
                         }
                     },
                 onKeyboardAction = {
-                    appState.navController.currentBackStackEntry?.savedStateHandle?.set(
-                        querySaveKey,
-                        queryState.text
-                    )
+                    onQuery(queryState.text.toString())
                     appState.scope.launch(Dispatchers.Main.immediate) {
                         sheetState.hide()
                         onDismissRequest()
@@ -211,6 +208,6 @@ private fun Preview() {
         SearchKeyInExtra("검색어를 입력해 주세요."),
         remember { FocusRequester() },
         rememberFlexibleBottomSheetState(),
-        "",
+        onQuery = {}
     ) { }
 }

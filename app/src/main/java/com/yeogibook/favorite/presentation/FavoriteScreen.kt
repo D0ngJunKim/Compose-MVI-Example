@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -16,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.navigation.compose.currentBackStackEntryAsState
 import com.yeogibook.abcmm.presentation.core.AppState
 import com.yeogibook.abcmm.presentation.core.NavigationRoute
 import com.yeogibook.abcmm.presentation.ui.FooterSpacerUiItem
@@ -28,27 +26,21 @@ import com.yeogibook.favorite.presentation.vm.intent.FavoriteSideEffect
 import com.yeogibook.search.keyin.presentation.SearchKeyInExtra
 import com.yeogibook.search.keyin.presentation.SearchKeyInScreen
 
-private const val QUERY_KEY = "FavoriteScreen"
-
 @Composable
 fun FavoriteScreen(
     appState: AppState,
-    viewModel: FavoriteViewModel = hiltViewModel<FavoriteViewModel>()
+    viewModel: FavoriteViewModel = hiltViewModel<FavoriteViewModel>(),
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
     val favoriteBooks by viewModel.uiItems.collectAsState()
 
     var isShowKeyIn by remember { mutableStateOf(false) }
     var keyInExtra: SearchKeyInExtra? by remember { mutableStateOf(null) }
-    val currentEntry by appState.navController.currentBackStackEntryAsState()
-    val query = currentEntry?.savedStateHandle?.get<String>(QUERY_KEY)
+    var query: String? by remember { mutableStateOf("") }
 
     val headerUiItem = remember(query) { FavoriteHeaderUiItem(query) }
     val footerUiItem = remember { FooterSpacerUiItem<FavoriteIntent>() }
 
-    LaunchedEffect(query) {
-        viewModel.setQuery(query)
-    }
 
     DisposableEffect(
         viewModel, lifecycleOwner
@@ -99,7 +91,15 @@ fun FavoriteScreen(
 
 
     if (isShowKeyIn) {
-        SearchKeyInScreen(appState, keyInExtra, QUERY_KEY, KeyboardType.Number, "금액대를 입력해 주세요.") {
+        SearchKeyInScreen(
+            appState = appState,
+            extra = keyInExtra,
+            keyboardType = KeyboardType.Number,
+            hintText = "금액대를 입력해 주세요.",
+            onQuery = { newQuery ->
+                query = newQuery
+                viewModel.setQuery(query)
+            }) {
             isShowKeyIn = false
             keyInExtra = null
         }

@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -16,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.yeogibook.abcmm.presentation.core.AppState
@@ -32,8 +30,6 @@ import com.yeogibook.search.result.presentation.units.header.SearchResultHeaderU
 import com.yeogibook.search.result.presentation.vm.SearchResultViewModel
 import com.yeogibook.search.result.presentation.vm.intent.SearchResultSideEffect
 
-private const val QUERY_KEY = "SearchResultScreen"
-
 @Composable
 fun SearchResultScreen(
     appState: AppState,
@@ -45,15 +41,10 @@ fun SearchResultScreen(
 
     var isShowKeyIn by remember { mutableStateOf(false) }
     var keyInExtra: SearchKeyInExtra? by remember { mutableStateOf(null) }
-    val currentEntry by appState.navController.currentBackStackEntryAsState()
-    val query = currentEntry?.savedStateHandle?.get<String>(QUERY_KEY)
+    var query: String? by remember { mutableStateOf(null) }
 
     val headerUiItem = remember(query) { SearchResultHeaderUiItem(query) }
 
-
-    LaunchedEffect(query) {
-        viewModel.setQuery(query)
-    }
 
     DisposableEffect(
         viewModel, lifecycleOwner
@@ -82,7 +73,10 @@ fun SearchResultScreen(
             List(
                 listState = listState,
                 viewModel = viewModel,
-                items = items
+                items = items,
+                onRefresh = {
+                    query = ""
+                }
             )
         }
         if (items.loadState.refresh is LoadState.Loading) {
@@ -97,7 +91,13 @@ fun SearchResultScreen(
     }
 
     if (isShowKeyIn) {
-        SearchKeyInScreen(appState, keyInExtra, QUERY_KEY) {
+        SearchKeyInScreen(
+            appState = appState,
+            extra = keyInExtra,
+            onQuery = { newQuery ->
+                query = newQuery
+                viewModel.setQuery(query)
+            }) {
             isShowKeyIn = false
             keyInExtra = null
         }

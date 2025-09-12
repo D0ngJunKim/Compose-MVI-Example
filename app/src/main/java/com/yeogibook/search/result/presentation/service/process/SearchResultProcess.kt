@@ -16,14 +16,17 @@ class SearchResultProcess {
     }
 
     fun processItem(
+        page: Int,
         query: String?,
-        sort: SearchResultSorts,
-        data: SearchResultDiData?
+        sort: SearchResultSorts?,
+        data: SearchResultDiData?,
     ): List<LazyItem<SearchResultIntent>> {
         val dataList = arrayListOf<LazyItem<SearchResultIntent>>()
 
-        getSearchResultDashboardUiItem(query, data?.meta)?.run {
-            dataList.add(this)
+        if (page == 1) {
+            getSearchResultDashboardUiItem(query, data?.meta)?.run {
+                dataList.add(this)
+            }
         }
 
         val itemList = arrayListOf<LazyItem<SearchResultIntent>>()
@@ -35,10 +38,14 @@ class SearchResultProcess {
             }
         }
 
-        if (!itemList.isEmpty()) {
-            itemList.add(0, SearchResultFilterUiItem(sort))
-        } else {
-            dataList.add(SearchResultEmptyUiItem())
+        if (page == 1) {
+            if (!itemList.isEmpty()) {
+                if (sort != null) {
+                    itemList.add(0, SearchResultFilterUiItem(sort))
+                }
+            } else {
+                dataList.add(SearchResultEmptyUiItem())
+            }
         }
 
         dataList.addAll(itemList)

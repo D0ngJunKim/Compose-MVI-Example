@@ -2,6 +2,7 @@ package com.yeogibook
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.addCallback
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.AnimatedContentTransitionScope
@@ -53,6 +54,14 @@ class MainActivity : ComponentActivity() {
         setContent {
             val appState = rememberAppState()
             AppNavHost(appState)
+
+            onBackPressedDispatcher.addCallback(this@MainActivity) {
+                if (appState.navController.currentDestination?.route != NavigationRoute.Main.config.route) {
+                    appState.navigateBack()
+                } else {
+                    finish()
+                }
+            }
         }
     }
 }
