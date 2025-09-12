@@ -19,3 +19,13 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# --- Di Class 예외처리.
+ -keep class **.data.entity.** { *; }
+ -keep class **.entity.** { *; }
+
+# --- Hilt
+-keep class dagger.hilt.** { *; }
+-keep class **_HiltModules { *; }
+-keep class **_HiltComponents { *; }
+-keep class **_Dagger* { *; }

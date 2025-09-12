@@ -22,12 +22,25 @@ android {
     }
 
     buildTypes {
-        release {
-            isMinifyEnabled = false
+        debug {
+            isShrinkResources = true
+            isMinifyEnabled = true
+            isDebuggable = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            addManifestPlaceholders(mapOf("networkSecurityConfig" to "@xml/network_security_config"))
+        }
+        release {
+            isShrinkResources = true
+            isMinifyEnabled = true
+            isDebuggable = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+            addManifestPlaceholders(mapOf("networkSecurityConfig" to "@null"))
         }
     }
     compileOptions {

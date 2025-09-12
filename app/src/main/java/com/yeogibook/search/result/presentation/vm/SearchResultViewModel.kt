@@ -34,8 +34,7 @@ class SearchResultViewModel @Inject constructor(
             query to sort
         }.flatMapLatest { (query, sort) ->
             repository.getSearchResults(query, sort)
-                .cachedIn(viewModelScope)
-        }
+        }.cachedIn(viewModelScope)
 
     fun setQuery(query: String?) {
         this._query.value = query
