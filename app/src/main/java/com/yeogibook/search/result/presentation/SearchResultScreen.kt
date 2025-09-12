@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,13 +39,11 @@ fun SearchResultScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
     val listState = rememberLazyListState()
     val items = viewModel.uiFlow.collectAsLazyPagingItems()
+    val query: String? by viewModel.query.collectAsState()
+    val headerUiItem = remember(query) { SearchResultHeaderUiItem(query) }
 
     var isShowKeyIn by remember { mutableStateOf(false) }
     var keyInExtra: SearchKeyInExtra? by remember { mutableStateOf(null) }
-    var query: String? by remember { mutableStateOf(null) }
-
-    val headerUiItem = remember(query) { SearchResultHeaderUiItem(query) }
-
 
     DisposableEffect(
         viewModel, lifecycleOwner
@@ -75,7 +74,7 @@ fun SearchResultScreen(
                 viewModel = viewModel,
                 items = items,
                 onRefresh = {
-                    query = ""
+                   viewModel.setQuery("")
                 }
             )
         }
@@ -95,8 +94,7 @@ fun SearchResultScreen(
             appState = appState,
             extra = keyInExtra,
             onQuery = { newQuery ->
-                query = newQuery
-                viewModel.setQuery(query)
+                viewModel.setQuery(newQuery)
             }) {
             isShowKeyIn = false
             keyInExtra = null

@@ -23,6 +23,7 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -119,9 +120,11 @@ private fun AppNavHost(
     }
 }
 
+
+
 @Composable
 private fun MainScreen(appState: AppState) {
-    val tabs = listOf("검색", "즐겨찾기")
+    val tabs = remember { listOf("검색", "즐겨찾기") }
     val pagerState = rememberPagerState(
         initialPage = 0,
         pageCount = { tabs.size }

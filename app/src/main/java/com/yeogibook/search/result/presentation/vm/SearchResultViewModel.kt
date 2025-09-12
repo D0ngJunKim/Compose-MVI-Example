@@ -15,6 +15,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import javax.inject.Inject
@@ -23,12 +24,13 @@ import javax.inject.Inject
 class SearchResultViewModel @Inject constructor(
     val repository: SearchResultRepository,
 ) : BaseViewModel<SearchResultSideEffect, SearchResultIntent>() {
-    private val query = MutableStateFlow<String?>(null)
+    private val _query = MutableStateFlow<String?>(null)
+    val query: StateFlow<String?> = _query
     private val sort = MutableStateFlow(SearchResultSorts.ACCURACY)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val uiFlow: Flow<PagingData<LazyItem<SearchResultIntent>>> =
-        combine(query, sort) { query, sort ->
+        combine(_query, sort) { query, sort ->
             query to sort
         }.flatMapLatest { (query, sort) ->
             repository.getSearchResults(query, sort)
@@ -36,7 +38,7 @@ class SearchResultViewModel @Inject constructor(
         }
 
     fun setQuery(query: String?) {
-        this.query.value = query
+        this._query.value = query
     }
 
     private fun onSort(sort: SearchResultSorts) {
@@ -46,7 +48,7 @@ class SearchResultViewModel @Inject constructor(
     override fun processIntent(intent: SearchResultIntent) {
         when (intent) {
             SearchResultIntent.OpenKeyIn -> {
-                sendSideEffect(OpenKeyIn(query.value.orEmpty()))
+                sendSideEffect(OpenKeyIn(_query.value.orEmpty()))
             }
 
             is SearchResultIntent.Sort -> {
