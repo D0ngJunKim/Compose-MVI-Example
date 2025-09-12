@@ -49,23 +49,23 @@ fun <Intent : Any> List(
             }
         }
 
-        items.itemSnapshotList.forEach { item ->
-            if (item != null) {
-                if (item.hasSticky()) {
-                    stickyHeader(
-                        key = item.itemKey(),
-                        contentType = item::class
-                    ) {
-                        item.BuildStickyItem(viewModel::processIntent)
-                    }
-                }
+        for (i in 0 until items.itemCount) {
+            val item = items.peek(i) ?: continue
 
-                item(
+            if (item.hasSticky()) {
+                stickyHeader(
                     key = item.itemKey(),
                     contentType = item::class
                 ) {
-                    item.BuildItem(viewModel::processIntent)
+                    item.BuildStickyItem(viewModel::processIntent)
                 }
+            }
+
+            item(
+                key = item.itemKey(),
+                contentType = item::class
+            ) {
+                items[i]?.BuildItem(viewModel::processIntent)
             }
         }
 
