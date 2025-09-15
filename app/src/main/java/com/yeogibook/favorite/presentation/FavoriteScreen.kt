@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
@@ -29,6 +31,7 @@ import com.yeogibook.search.keyin.presentation.SearchKeyInScreen
 @Composable
 fun FavoriteScreen(
     appState: AppState,
+    listState: LazyListState = rememberLazyListState(),
     viewModel: FavoriteViewModel = hiltViewModel<FavoriteViewModel>(),
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -66,6 +69,7 @@ fun FavoriteScreen(
         headerUiItem.BuildItem(viewModel::processIntent)
 
         LazyColumn(
+            state = listState,
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f),

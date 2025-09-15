@@ -43,6 +43,8 @@ fun Modifier.card(
     .clip(shape)
 
 
+fun Modifier.isClickable() = this.onClick { }
+
 fun Modifier.onClick(
     enabled: Boolean = true,
     onClickLabel: String? = null,
