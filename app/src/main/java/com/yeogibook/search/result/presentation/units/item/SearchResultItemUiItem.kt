@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
@@ -42,6 +43,7 @@ import coil3.size.Scale
 import com.yeogibook.R
 import com.yeogibook.abcmm.data.entity.BookDocumentDiData
 import com.yeogibook.abcmm.presentation.core.LazyItem
+import com.yeogibook.abcmm.presentation.core.ListSpan
 import com.yeogibook.abcmm.presentation.ui.LocalText
 import com.yeogibook.abcmm.presentation.ui.card
 import com.yeogibook.abcmm.presentation.ui.ds.padding
@@ -58,7 +60,7 @@ data class SearchResultItemUiItem(
     private val originPrice: String?,
     private val displayPrice: String?,
     private val origin: BookDocumentDiData,
-) : LazyItem<SearchResultIntent>() {
+) : LazyItem<SearchResultIntent>(ListSpan.SINGLE_FOR_ALL) {
 
     override fun itemKey(): Int {
         return origin.isbn?.replace(" ", "")?.toIntOrNull() ?: super.itemKey()
@@ -66,10 +68,12 @@ data class SearchResultItemUiItem(
 
     @Composable
     override fun BuildItem(processIntent: (SearchResultIntent) -> Unit) {
+        val isInspectionMode = LocalInspectionMode.current
+
         ConstraintLayout(
             modifier = Modifier
+                .padding(vertical = SpaceToken._4)
                 .fillMaxWidth()
-                .padding(horizontal = SpaceToken._16, vertical = SpaceToken._4)
                 .card(
                     shape = RoundedCornerShape(10.dp),
                     shadow = Shadow(
@@ -183,19 +187,25 @@ data class SearchResultItemUiItem(
                         horizontalBias = 0f
                     })
             }
+            var isFavorite by remember(origin) {
+                mutableStateOf(
+                    if (isInspectionMode) false else FavoriteBookManager.isFavoriteBook(origin)
+                )
+            }
 
-            var isFavorite by remember(origin) { mutableStateOf(FavoriteBookManager.isFavoriteBook(origin)) }
+            if (isInspectionMode.not()) {
+                DisposableEffect(origin) {
+                    val listener = {
+                        isFavorite = FavoriteBookManager.isFavoriteBook(origin)
+                    }
+                    FavoriteBookManager.addListener(listener)
 
-            DisposableEffect(origin) {
-                val listener = {
-                    isFavorite = FavoriteBookManager.isFavoriteBook(origin)
-                }
-                FavoriteBookManager.addListener(listener)
-
-                onDispose {
-                    FavoriteBookManager.removeListener(listener)
+                    onDispose {
+                        FavoriteBookManager.removeListener(listener)
+                    }
                 }
             }
+
             Box(
                 modifier = Modifier
                     .size(32.dp)

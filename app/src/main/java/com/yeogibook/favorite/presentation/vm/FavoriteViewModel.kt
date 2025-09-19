@@ -45,8 +45,8 @@ class FavoriteViewModel : BaseViewModel<FavoriteSideEffect, FavoriteIntent>() {
             }
 
         val sortedList = when (sort) {
-            FavoriteSorts.ASCENDING -> filteredList.sortedBy { it.title }
-            FavoriteSorts.DESCENDING -> filteredList.sortedByDescending { it.title }
+            FavoriteSorts.ASCENDING -> filteredList.sortedBy { it.salePrice }
+            FavoriteSorts.DESCENDING -> filteredList.sortedByDescending { it.salePrice }
         }
         val itemList: ArrayList<LazyItem<FavoriteIntent>> =
             sortedList.mapTo(arrayListOf()) { getFavoriteItemUiItem(it) }

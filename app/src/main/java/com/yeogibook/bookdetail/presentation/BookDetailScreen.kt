@@ -17,6 +17,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -62,10 +64,13 @@ import com.yeogibook.favorite.presentation.util.FavoriteBookManager
 @Composable
 fun BookDetailScreen(appState: AppState, data: BookDocumentDiData?) {
     if (data != null) {
+        val state = rememberScrollState()
+
         Column(
             Modifier
                 .fillMaxSize()
                 .padding(horizontal = SpaceToken._16)
+                .verticalScroll(state)
         ) {
             Spacer(
                 modifier = Modifier.height(
@@ -284,7 +289,7 @@ fun BookDetailScreen(appState: AppState, data: BookDocumentDiData?) {
                     .fillMaxWidth()
             )
 
-            val isbn = remember { "ISBN : ${data.isbn?.replace(" ", ", ")}" }
+            val isbn = remember { "ISBN : ${data.isbn?.trim()?.replace(" ", ", ")}" }
 
             LocalText(
                 text = isbn,

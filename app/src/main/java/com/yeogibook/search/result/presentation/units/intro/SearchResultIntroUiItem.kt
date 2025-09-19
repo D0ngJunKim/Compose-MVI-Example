@@ -23,7 +23,7 @@ class SearchResultIntroUiItem : LazyItem<SearchResultIntent>() {
         ConstraintLayout(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = SpaceToken._16, vertical = SpaceToken._60)
+                .padding(vertical = SpaceToken._60)
         ) {
             val (image, text) = createRefs()
             Image(

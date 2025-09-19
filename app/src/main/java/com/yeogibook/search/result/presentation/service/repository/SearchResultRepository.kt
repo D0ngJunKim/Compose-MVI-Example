@@ -3,11 +3,10 @@ package com.yeogibook.search.result.presentation.service.repository
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import com.yeogibook.search.result.data.constants.SearchResultSorts
-import com.yeogibook.search.result.presentation.service.SearchResultLoadParams
-import com.yeogibook.search.result.presentation.service.SearchResultService
+import com.yeogibook.search.result.data.request.SearchResultLoadParams
 import com.yeogibook.search.result.presentation.service.datasource.SearchResultDataSource
 
-class SearchResultRepository(private val apiService: SearchResultService) {
+class SearchResultRepository() {
     fun getSearchResults(
         query: String?,
         sort: SearchResultSorts,
@@ -17,6 +16,6 @@ class SearchResultRepository(private val apiService: SearchResultService) {
             prefetchDistance = 10
         ),
         initialKey = SearchResultLoadParams(1, query, sort),
-        pagingSourceFactory = { SearchResultDataSource(apiService) }
+        pagingSourceFactory = { SearchResultDataSource() }
     ).flow
 }

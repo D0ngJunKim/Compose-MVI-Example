@@ -10,7 +10,7 @@ import com.yeogibook.search.result.presentation.units.item.getSearchResultItemUi
 import com.yeogibook.search.result.presentation.units.result.getSearchResultDashboardUiItem
 import com.yeogibook.search.result.presentation.vm.intent.SearchResultIntent
 
-class SearchResultProcess {
+object SearchResultProcess {
     fun processInit(): List<LazyItem<SearchResultIntent>> {
         return arrayListOf(SearchResultIntroUiItem())
     }

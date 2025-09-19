@@ -4,9 +4,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
@@ -20,6 +19,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.yeogibook.abcmm.presentation.core.AppState
+import com.yeogibook.abcmm.presentation.core.List
 import com.yeogibook.abcmm.presentation.core.NavigationRoute
 import com.yeogibook.abcmm.presentation.ui.FooterSpacerUiItem
 import com.yeogibook.abcmm.presentation.vm.observeSideEffects
@@ -33,7 +33,7 @@ import com.yeogibook.search.keyin.presentation.SearchKeyInScreen
 @Composable
 fun FavoriteScreen(
     appState: AppState,
-    listState: LazyListState = rememberLazyListState(),
+    listState: LazyGridState = rememberLazyGridState(),
     viewModel: FavoriteViewModel = hiltViewModel<FavoriteViewModel>(),
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -74,29 +74,16 @@ fun FavoriteScreen(
     ) {
         headerUiItem.BuildItem(viewModel::processIntent)
 
-        LazyColumn(
+        List(
             state = listState,
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f),
-            overscrollEffect = null
-        ) {
-            favoriteBooks.forEach { book ->
-                if (book.hasSticky()) {
-                    stickyHeader {
-                        book.BuildStickyItem(viewModel::processIntent)
-                    }
-                }
-
-                item {
-                    book.BuildItem(viewModel::processIntent)
-                }
-            }
-
-            item {
-                footerUiItem.BuildItem(viewModel::processIntent)
-            }
-        }
+            viewModel = viewModel,
+            items = favoriteBooks,
+            footerItem = footerUiItem,
+            isUsePullToRefresh = false
+        )
     }
 
 

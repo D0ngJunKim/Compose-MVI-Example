@@ -3,8 +3,8 @@ package com.yeogibook.search.result.presentation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
@@ -35,7 +35,7 @@ import com.yeogibook.search.result.presentation.vm.intent.SearchResultSideEffect
 @Composable
 fun SearchResultScreen(
     appState: AppState,
-    listState: LazyListState = rememberLazyListState(),
+    listState: LazyGridState = rememberLazyGridState(),
     viewModel: SearchResultViewModel = hiltViewModel(),
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -71,7 +71,7 @@ fun SearchResultScreen(
             headerUiItem.BuildItem(viewModel::processIntent)
 
             List(
-                listState = listState,
+                state = listState,
                 viewModel = viewModel,
                 items = items,
                 onRefresh = {
@@ -95,6 +95,7 @@ fun SearchResultScreen(
             appState = appState,
             extra = keyInExtra,
             onQuery = { newQuery ->
+                listState.requestScrollToItem(0)
                 viewModel.setQuery(newQuery)
             }) {
             isShowKeyIn = false

@@ -20,7 +20,7 @@ data class SearchResultDashboardUiItem(private val query: AnnotatedString) :
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = SpaceToken._16, vertical = SpaceToken._10)
+                .padding(vertical = SpaceToken._10)
         ) {
             LocalText(
                 text = query,

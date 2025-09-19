@@ -52,7 +52,6 @@ data class SearchResultFilterUiItem(val sort: SearchResultSorts) : LazyItem<Sear
         ) {
             Row(
                 modifier = Modifier
-                    .padding(end = SpaceToken._16)
                     .align(Alignment.CenterEnd)
                     .border(
                         width = 1.dp,

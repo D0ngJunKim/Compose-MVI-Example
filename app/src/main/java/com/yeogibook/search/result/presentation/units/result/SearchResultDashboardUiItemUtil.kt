@@ -10,7 +10,7 @@ import com.yeogibook.search.result.data.entity.SearchResultMetaDiData
 
 fun getSearchResultDashboardUiItem(
     query: String?,
-    data: SearchResultMetaDiData?
+    data: SearchResultMetaDiData?,
 ): SearchResultDashboardUiItem? {
     if (query.isNullOrEmpty()) return null
 

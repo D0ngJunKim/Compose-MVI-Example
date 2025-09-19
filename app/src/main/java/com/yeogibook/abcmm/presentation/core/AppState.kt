@@ -1,16 +1,14 @@
 package com.yeogibook.abcmm.presentation.core
 
+import android.content.res.Configuration
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.navigation.NavDestination
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navOptions
-import androidx.savedstate.savedState
 import kotlinx.coroutines.CoroutineScope
-import kotlin.math.round
 
 @Composable
 fun rememberAppState(
@@ -37,4 +35,10 @@ data class AppState(
     fun navigateBack() {
         navController.popBackStack(navController.graph.startDestinationId, inclusive = false)
     }
+}
+
+@Composable
+fun isTablet(): Boolean {
+    val configuration = LocalConfiguration.current
+    return (configuration.screenLayout and (Configuration.SCREENLAYOUT_SIZE_MASK)) >= Configuration.SCREENLAYOUT_SIZE_LARGE
 }

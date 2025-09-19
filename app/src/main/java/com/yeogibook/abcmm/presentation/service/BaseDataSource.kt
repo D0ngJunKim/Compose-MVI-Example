@@ -2,15 +2,14 @@ package com.yeogibook.abcmm.presentation.service
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
+import com.yeogibook.abcmm.data.request.BaseRequest
 import com.yeogibook.abcmm.presentation.core.LazyItem
-import retrofit2.Call
 import retrofit2.awaitResponse
 
-/**
- * Created by 180842 on 2025. 9. 12..
- */
+
 abstract class BaseDataSource<Params : BaseLoadParams<Params>, Response : Any, Intent : Any> :
     PagingSource<Params, LazyItem<Intent>>() {
+    protected abstract val request: BaseRequest<Params, Response>
 
     override fun getRefreshKey(state: PagingState<Params, LazyItem<Intent>>): Params? {
         return null
@@ -25,7 +24,7 @@ abstract class BaseDataSource<Params : BaseLoadParams<Params>, Response : Any, I
             }
 
             val page = requestParams?.page ?: 1
-            val response = getCall(page, requestParams).awaitResponse()
+            val response = request.createCall(page, requestParams).awaitResponse()
 
             if (response.isSuccessful) {
                 val result = response.body()
@@ -47,8 +46,6 @@ abstract class BaseDataSource<Params : BaseLoadParams<Params>, Response : Any, I
     protected open fun onPreRequest(params: Params?): LoadResult<Params, LazyItem<Intent>>? {
         return null
     }
-
-    abstract fun getCall(page: Int, params: Params?): Call<Response>
 
     abstract fun hasNextPage(response: Response?): Boolean
 

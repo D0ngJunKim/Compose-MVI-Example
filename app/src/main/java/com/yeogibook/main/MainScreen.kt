@@ -21,8 +21,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
@@ -61,17 +61,15 @@ import com.yeogibook.search.result.presentation.SearchResultScreen
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
-/**
- * Created by 180842 on 2025. 9. 15..
- */
-data class TabInfo(val tabNm: String, val listState: LazyListState)
+
+data class TabInfo(val tabNm: String, val listState: LazyGridState)
 
 @Composable
 fun MainScreen(appState: AppState) {
     val isInspectMode = LocalInspectionMode.current
     val tabs = listOf(
-        TabInfo("검색", rememberLazyListState()),
-        TabInfo("즐겨찾기", rememberLazyListState())
+        TabInfo("검색", rememberLazyGridState()),
+        TabInfo("즐겨찾기", rememberLazyGridState())
     )
     val pagerState = rememberPagerState(
         initialPage = 0,
@@ -178,9 +176,7 @@ private fun TabBar(
                         shape = RoundedCornerShape(15.dp)
                     )
                     .onClick {
-                        appState.scope.launch {
-                            tabs[pagerState.currentPage].listState.animateScrollToItem(0)
-                        }
+                        tabs[pagerState.currentPage].listState.requestScrollToItem(0)
                     }
             ) {
                 Image(

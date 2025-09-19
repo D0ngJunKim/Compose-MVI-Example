@@ -2,9 +2,8 @@ package com.yeogibook.abcmm.presentation.core
 
 import androidx.compose.runtime.Composable
 import java.util.UUID
-import kotlin.uuid.toKotlinUuid
 
-abstract class LazyItem<Intent : Any> {
+abstract class LazyItem<Intent : Any>(val span: ListSpan = ListSpan.FULL_FOR_ALL) {
     open fun itemKey(): Int = UUID.randomUUID().hashCode()
     open fun hasSticky(): Boolean = false
 
